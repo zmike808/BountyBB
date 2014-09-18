@@ -1,5 +1,6 @@
 generate node id:
-  sha512 hash of time down to nanosecond
+  node id = uncompressed bitcoin public key
+  
 
 DHT STRUCTURE:
   possible keys: sha512 filehash OR node id
@@ -18,10 +19,19 @@ how requester finds a node that has file (RID = requesting node id, RID_IP = IP 
     if secret_target_hash is in response list: **
       RID requests that CID transfer file
       CID transfers file to RID
+      RID checks if file hash of file they received matches the hash of the file they were looking for
+      if it matched:
+        if RID wants to give CID reward:
+          RID generates payment address from CID
+          RID pays x cryptocurrency to previously generated payment address
+        finished
+      else:
+        start process over with the next closest CID
     else:
       repeat process on the next closest CID
       
 **Ideas on how to transfer file from RID to CID:
+(TCP would obviously make the transfer process a joke, but TCP is a two way connection...which could be problematic when trying to create a minimal trust system, hence why I'm leaning more towards UDP)
   RID sends start_download_request message via UDP to CID_IP
     start_download_request FORMAT:
       [RID_IP:RID_PORT, target_hash]
