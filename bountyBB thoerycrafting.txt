@@ -1,0 +1,35 @@
+generate node id:
+  sha512 hash of time down to nanosecond
+
+DHT STRUCTURE:
+  possible keys: sha512 filehash OR node id
+    filehash: [list of nodeids that are offering/have file] (MAYBE JUST MAKE IT A LIST OF IP ADDRESSES OFFERING FILE?)
+    node id: [ip of node]
+  
+how requester finds a node that has file (RID = requesting node id, RID_IP = IP of requesting node, target_hash = filehash we want the file for):
+  look up target_hash in question within DHT
+  find the node id closest to your own by iterating through the list and computing the vector distance 
+  look up closest node ID (CID) (storing CID's ip for later, CID_IP)
+  send CID your RID and ask for a list the hashes of all the files they are offering
+  CID computes hash response list by taking SHA512(SHA512(filehash of each file they are offering) + RID)
+  CID sends response list back to RID
+  RID computes secret_target_hash by taking SHA512(target_hash + RID)
+  RID checks if secret_target_hash is in response list
+    if secret_target_hash is in response list: **
+      RID requests that CID transfer file
+      CID transfers file to RID
+    else:
+      repeat process on the next closest CID
+      
+**Ideas on how to transfer file from RID to CID:
+  RID sends start_download_request message via UDP to CID_IP
+    start_download_request FORMAT:
+      [RID_IP:RID_PORT, target_hash]
+  CID locates file that matches target_hash
+  CID splits file into x chunks of with the size of each chunk being y bytes (file_size/x = y; TBD: value of y, or how to dynamically scale it; currently thinking y = 20)
+  CID sends metainfo packet to RID:
+    metainfo packet format:
+      [file_size, number of chunks, chunk size]
+  CID sends x packets to RID (TBD: value of x; currently thinking x = 20, so 20 packets)
+    PACKET FORMAT:
+    [packet number (1..x), bytes (len(bytes) == y), checksum of bytes]
