@@ -10,21 +10,15 @@ import java.io.Serializable;
  *  
  * 
  */
-public class FileData implements Serializable {
+public class DataWrapper implements Serializable {
 
 	private static final long serialVersionUID = 2007612126394688791L;
 	private final byte[] bytes;
-	private final String fileName;
-	public FileData(byte[] bytes, String fileName) {
+	public DataWrapper(byte[] bytes) {
 		this.bytes = bytes;
-		this.fileName = fileName;
 	}
 	
 	public byte[] getBytes() {
 		return this.bytes;
-	}
-	
-	public String getFileName() {
-		return this.fileName;
 	}
 }

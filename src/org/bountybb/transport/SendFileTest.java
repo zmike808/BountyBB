@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.bountybb.utils.FileData;
+import org.bountybb.utils.FileDataWrapper;
 
 import net.tomp2p.dht.FutureSend;
 import net.tomp2p.dht.PeerBuilderDHT;
@@ -51,7 +51,7 @@ public class SendFileTest {
 		RequestP2PConfiguration requestP2PConfiguration = new RequestP2PConfiguration(1, 10, 0);
 		Path path = Paths.get(fileName);
 		byte[] bytes = Files.readAllBytes(path);
-		FileData fd = new FileData(bytes, fileName);
+		FileDataWrapper fd = new FileDataWrapper(fileName, bytes);
 		FutureSend futureSend = from.send(to).object(fd)
 		        .requestP2PConfiguration(requestP2PConfiguration).start();
 		futureSend.awaitUninterruptibly();
@@ -66,7 +66,7 @@ public class SendFileTest {
 				public Object reply(PeerAddress sender, Object request) throws Exception {
 					System.err.println("I'm " + peer.peerID() + " and I just got the message [" + request
 					        + "] from " + sender.peerId());
-					FileData fd = (FileData) request;
+					FileDataWrapper fd = (FileDataWrapper) request;
 					byte[] bytes = fd.getBytes();
 					String fileName = fd.getFileName();
 					FileOutputStream out = new FileOutputStream(fileName);
