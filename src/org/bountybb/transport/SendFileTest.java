@@ -30,20 +30,24 @@ public class SendFileTest {
 		PeerDHT master = null;
 		try {
 			PeerDHT[] peers = new PeerDHT[3];
-			peers[0] = new PeerBuilderDHT(new PeerBuilder( new Number160( RND ) ).ports( 4001 ).start()).start();
-			peers[1] = new PeerBuilderDHT(new PeerBuilder( BTCHASH_1 ).masterPeer( peers[0].peer() ).start()).start();//ExampleUtils.createAndAttachPeersDHT(100, 4001);
-			peers[2] = new PeerBuilderDHT(new PeerBuilder( BTCHASH_2 ).masterPeer( peers[0].peer() ).start()).start();//ExampleUtils.createAndAttachPeersDHT(100, 4001);
+			//peers[0] = new PeerBuilderDHT(new PeerBuilder( new Number160( RND ) ).ports( 4001 ).start()).start();
 			
+			peers[1] = new PeerBuilderDHT(new PeerBuilder( BTCHASH_1 ).start()).start();//ExampleUtils.createAndAttachPeersDHT(100, 4001);
+			System.err.println("peer 1 finished");
+			peers[2] = new PeerBuilderDHT(new PeerBuilder( BTCHASH_2 ).start()).start();//ExampleUtils.createAndAttachPeersDHT(100, 4001);
+			System.err.println("peer 2 finished");
+			peers[1].peer().bootstrap().peerAddress(peerAddress)
 			ExampleUtils.bootstrap(peers);
-			master = peers[0];
+			System.err.println("strapping boots done");
+			//master = peers[0];
 			setupReplyHandler(peers);
 			String fileName = "C:\\testing.jpg";
 			exampleSendFile(peers[1], BTCHASH_2, fileName);
 			Thread.sleep(10000);
+			//master.shutdown();
+			exampleSendFile(peers[2], BTCHASH_1, "C:\\testing2.jpg");
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			master.shutdown();
 		}
 	}
 
